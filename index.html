@@ -1,0 +1,45 @@
+<DOCTYPE html>
+    <head>
+        <title>Place Finder</title>
+        <link rel="stylesheet" href="main.css">
+    </head>
+    <body>
+        <div id="header">
+            <h1>Place Finder</h1>
+        </div>
+
+        <div class="inputContainer">
+            <input type="text" id="cityInput" placeholder="Enter a City Name">
+            <button id="findCity">Find City!</button>
+        </div>
+
+        <div id="mapContainer">
+            <!--<p>mapContainer</p>-->
+        </div>
+
+        <div id="cityListContainer">
+            <ul id="cityDataList">
+                <li>City Data:</li>
+            </ul>
+            <ul id="cityList">
+                <li>Viewed Cities:</li>
+            </ul>
+        </div>
+
+        <div class="inputContainer">
+            <input type="text" id="placeInput" placeholder="Enter a Place of Interest">
+            <button id="findPlace" onclick="Javascript:someJSFunction()">Find Places of Interest</button>
+        </div>
+
+        <div id="placeListContainer">
+            <ul id="placeList">
+                <li>Places of Interest:</li>
+            </ul>
+        </div>
+
+        <script src="scripts.js"></script>
+        <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfr9AHIBiM-cj5XfxtP6Leh-k6X5Fm0d0&callback=initialize">
+        </script>
+    </body>
+</DOCTYPE>
