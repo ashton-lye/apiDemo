@@ -2,7 +2,7 @@
 
 var map;
 var geocoder;
-//var cityArray = [];
+var cityArray = [];
 
 function someJSFunction() {
     alert('someJSFunction');
@@ -43,26 +43,31 @@ function createCityObject(search) {
             //alert('result: '+result[0].geometry.location+', lat: '+location);
             
             var city = new cityObject(name, location, sunrise, sunset);
-            //cityArray.push(city);
+            cityArray.push(city);
 
             var cityList = document.getElementById("cityList");
             console.log(city);
-            cityList.innerHTML += '<li onclick="Javascript:alert("clicked!")">'+city.name+'</li>';
-            displayLocation(city);
+            var nameString = '"'+city.name+'"';
+            var element = "<li onclick='Javascript:displayLocation("+nameString+")'>"+city.name+"</li>";
+            console.log(element);
+            cityList.innerHTML += element;
+            displayLocation(city.name);
         }
         else {
             alert('Geocoder search failed. Status code: ' + status);
-        }
-    })
+        };
+    });
 };
 
-function displayLocation(city) {
-        map.setCenter(city.location);
-        var marker = new google.maps.Marker({
-          map: map,
-          position: city.location,
-        });
-
-        
+function displayLocation(cityName) {
+    for (var i = 0; i < cityArray.length; i++){
+        if (cityName == cityArray[i].name){
+            map.setCenter(cityArray[i].location);
+            var marker = new google.maps.Marker({
+            map: map,
+            position: cityArray[i].location,
+            });
+        };
+    };  
 };
 
