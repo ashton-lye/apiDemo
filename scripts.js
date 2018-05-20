@@ -79,7 +79,8 @@ function createCityObject(search) {
             var lat = result[0].geometry.location.lat();
             var long = result[0].geometry.location.lng();
             //sunrise-sunset API request to get sunrise/set times
-            ajaxRequest("GET", "https://api.sunrise-sunset.org/json?lat="+lat+"&lng=-"+long, false, "", function(results) {
+            ajaxRequest("POST", "sunset-sunrise.php", false, "lat="+lat+"&long="+long, function(results) {
+                console.log(results);
                 parsedResult = JSON.parse(results);   
                 console.log(parsedResult);
                 console.log(parsedResult.results.sunrise);
