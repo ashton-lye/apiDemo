@@ -3,6 +3,7 @@
 //create map, geocoder and array here so we can use them everywhere
 var map;
 var geocoder;
+var displayedLocation;
 var cityArray = [];
 
 function someJSFunction() {
@@ -10,9 +11,11 @@ function someJSFunction() {
 }
 
 //constructor city object
-function cityObject(name, location, sunrise, sunset) {
+function cityObject(name, location, latitude, longitude, sunrise, sunset) {
     this.name = name;
     this.location = location;
+    this.latitude = latitude;
+    this.longitude = longitude;
     this.sunrise = sunrise;
     this.sunset = sunset;
 };
@@ -45,19 +48,27 @@ function ajaxRequest(method, url, async, data, callback){
 function initialize() {
     //create map object
     map = new google.maps.Map(document.getElementById('mapContainer'), {
-      zoom: 8,
+      zoom: 2,
       center: {lat: 0.0, lng: 0.0}
     });
 
     //create geocoder object
     geocoder = new google.maps.Geocoder();
-    var search = ""; 
+    var citySearch = ""; 
+    var placeSearch = "";
 
     //add event listener for the find city button
     //this is better than using onclick because I can pass values
     document.getElementById('findCity').addEventListener('click', function() {
-        search = document.getElementById('cityInput').value;
-        createCityObject(search);
+        citySearch = document.getElementById('cityInput').value;
+        createCityObject(citySearch);
+    });
+
+    //event listener for the place of interest button
+    document.getElementById('findPlace').addEventListener('click', function() {
+        placeSearch = document.getElementById('placeInput').value;
+        var data = "location="+displayedLocation+"&search="+placeSearch;
+        ajaxRequest("POST", "placeSearch.php", true, data, displayPlaces);
     });
 };
 
@@ -68,25 +79,28 @@ function createCityObject(search) {
             //get the formatted address and co-ordinates from geocoder response
             var name = result[0].formatted_address;
             var location = result[0].geometry.location;
-
-            //create a new city object using the name and location above
-            var city = new cityObject(name, location);
-
+            var latitude = result[0].geometry.location.lat();
+            var longitude = result[0].geometry.location.lng();
             var sunrise;
             var sunset;
+
+            //create a new city object using the attributes specified above
+            var city = new cityObject(name, location, latitude, longitude, sunrise, sunset);    
             
-            //break the location into latitude and longitude
-            var lat = result[0].geometry.location.lat();
-            var long = result[0].geometry.location.lng();
             //sunrise-sunset API request to get sunrise/set times
-            ajaxRequest("POST", "sunset-sunrise.php", false, "lat="+lat+"&long="+long, function(results) {
+            ajaxRequest("POST", "sunset-sunrise.php", false, "lat="+city.latitude+"&long="+city.longitude, function(results) {
                 console.log(results);
                 parsedResult = JSON.parse(results);   
                 console.log(parsedResult);
                 console.log(parsedResult.results.sunrise);
+                var sunrise = parsedResult.results.sunrise;
+                var sunset = parsedResult.results.sunset;
+                var splitSunrise = sunrise.split(" ");
+                var splitSunset = sunset.split(" ");
+
                 //give the city object the sunrise and sunset values
-                city.sunrise = parsedResult.results.sunrise;
-                city.sunset = parsedResult.results.sunset;
+                city.sunrise = splitSunrise[0];
+                city.sunset = splitSunset[0];
                 console.log(city);
             });
             //add the city object to the city array
@@ -114,23 +128,47 @@ function displayLocation(cityName) {
     //iterate through the city array looking for a city with the name that was passed in
     for (var i = 0; i < cityArray.length; i++){
         if (cityName == cityArray[i].name){
-            //setting the center of the map and adding a marker
-            map.setCenter(cityArray[i].location);
-            var marker = new google.maps.Marker({
-            map: map,
-            position: cityArray[i].location,
-            });
+            //update map to show city
+            displayedLocation = ""+cityArray[i].latitude+","+cityArray[i].longitude;
+            console.log(displayedLocation);
+            updateMap(cityArray[i].location);
+            map.setZoom(10);
 
-            //creaing and adding li elements to display the city data
+            //creating and adding li elements to display the city data
             var dataList = document.getElementById("cityDataList");
             dataList.innerHTML = 
             "<li><b>City Data:</b></li>"
             +"<li>City Name: "+cityArray[i].name+"</li>"
             +"<li>Latitude/Longitude: "+cityArray[i].location+"</li>"
-            +"<li>Current Time: WIP</li>"
-            +"<li>Sunrise Time: "+cityArray[i].sunrise+"</li>"
-            +"<li>Sunset Time: "+cityArray[i].sunset+"</li>";
+            //+"<li>Current Time: WIP</li>"
+            +"<li>Sunrise Time: "+cityArray[i].sunrise+" AM</li>"
+            +"<li>Sunset Time: "+cityArray[i].sunset+" PM</li>";
         };
     };  
+};
+
+function updateMap(coordinates){
+    console.log("map updating");
+    //function to center map on a given location and add a marker at said location
+    map.setCenter(coordinates);
+    map.setZoom(15);
+    var marker = new google.maps.Marker({
+        map: map,
+        position: coordinates,
+    });
+};
+
+function displayPlaces(result) {
+    var placeList = document.getElementById("placeList");
+    placeList.innerHTML = "<li><b>Places of Interest:</b></li>";
+    var parsedPlaces = JSON.parse(result);
+    console.log(parsedPlaces);
+    for (var i = 0; i < parsedPlaces.results.length; i++) {
+        var locationString = JSON.stringify(parsedPlaces.results[i].geometry.location);
+        console.log(locationString);
+        var element = "<li onclick='Javascript:updateMap("+locationString+")'>"+parsedPlaces.results[i].name+" - "+parsedPlaces.results[i].vicinity+"</li>";
+        console.log(element);
+        placeList.innerHTML += element;
+    };
 };
 

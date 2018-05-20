@@ -8,7 +8,6 @@
     curl_setopt($connection, CURLOPT_RETURNTRANSFER, true);
 
     $response = curl_exec($connection);
-    $result = json_decode($response);
 
     curl_close($connection);
 
