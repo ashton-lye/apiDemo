@@ -89,10 +89,9 @@ function createCityObject(search) {
             
             //sunrise-sunset API request to get sunrise/set times
             ajaxRequest("POST", "sunset-sunrise.php", false, "lat="+city.latitude+"&long="+city.longitude, function(results) {
-                console.log(results);
                 parsedResult = JSON.parse(results);   
-                console.log(parsedResult);
-                console.log(parsedResult.results.sunrise);
+
+                //split timestamp strings to remove the AM and PM parts
                 var sunrise = parsedResult.results.sunrise;
                 var sunset = parsedResult.results.sunset;
                 var splitSunrise = sunrise.split(" ");
@@ -101,11 +100,9 @@ function createCityObject(search) {
                 //give the city object the sunrise and sunset values
                 city.sunrise = splitSunrise[0];
                 city.sunset = splitSunset[0];
-                console.log(city);
             });
             //add the city object to the city array
-            cityArray.push(city);   
-            console.log(cityArray);         
+            cityArray.push(city);       
 
             //create li elements for the searched city and add it to the list of searched cities
             var cityList = document.getElementById("cityList");
@@ -115,6 +112,8 @@ function createCityObject(search) {
             //when the element is clicked, it calls the displayLocation function and passes in the name of the city to display
             var element = "<li onclick='Javascript:displayLocation("+nameString+")'>"+city.name+"</li>";
             cityList.innerHTML += element;
+
+            //call function to display city data etc
             displayLocation(city.name);
         }
         else {
@@ -130,7 +129,8 @@ function displayLocation(cityName) {
         if (cityName == cityArray[i].name){
             //update map to show city
             displayedLocation = ""+cityArray[i].latitude+","+cityArray[i].longitude;
-            console.log(displayedLocation);
+
+            //call function to update map
             updateMap(cityArray[i].location);
             map.setZoom(10);
 
@@ -148,7 +148,6 @@ function displayLocation(cityName) {
 };
 
 function updateMap(coordinates){
-    console.log("map updating");
     //function to center map on a given location and add a marker at said location
     map.setCenter(coordinates);
     map.setZoom(15);
@@ -158,16 +157,18 @@ function updateMap(coordinates){
     });
 };
 
+//callback function for the google places API request made by clicking the find place button
+//i.e what happens when you click the button
 function displayPlaces(result) {
     var placeList = document.getElementById("placeList");
     placeList.innerHTML = "<li><b>Places of Interest:</b></li>";
     var parsedPlaces = JSON.parse(result);
-    console.log(parsedPlaces);
+
+    //loop through the array of places returned by the request and add an li element to the places list
     for (var i = 0; i < parsedPlaces.results.length; i++) {
         var locationString = JSON.stringify(parsedPlaces.results[i].geometry.location);
-        console.log(locationString);
+        //the onclick function calls the update map function to show the selected place
         var element = "<li onclick='Javascript:updateMap("+locationString+")'>"+parsedPlaces.results[i].name+" - "+parsedPlaces.results[i].vicinity+"</li>";
-        console.log(element);
         placeList.innerHTML += element;
     };
 };
