@@ -98,6 +98,7 @@ function createCityObject(search) {
             var element = '<li onclick="Javascript:displayLocation('+nameString+')">'+city.name+'</li>';
             cityList.innerHTML += element;
 
+            //add some text to show the city data is loading
             var dataList = document.getElementById("cityDataList");
             dataList.innerHTML = "";
             dataList.innerHTML = "<li><b>City Data:</b></li><li>Loading City Data...</li>";
@@ -174,6 +175,8 @@ function updateMap(coordinates){
 function displayPlaces(result) {
     var placeList = document.getElementById("placeList");
     placeList.innerHTML = "<li><b>Places of Interest:</b></li>";
+    
+    //using a try/catch so we can display an error message when no results are found
     try {
         var parsedPlaces = JSON.parse(result);
 
