@@ -175,20 +175,27 @@ function updateMap(coordinates){
 function displayPlaces(result) {
     var placeList = document.getElementById("placeList");
     placeList.innerHTML = "<li><b>Places of Interest:</b></li>";
-    
-    //using a try/catch so we can display an error message when no results are found
+
+    //using a try/catch so we can display an error message if the search term doesnt work
     try {
         var parsedPlaces = JSON.parse(result);
+        //check the search actually got results
+        if (parsedPlaces.status = "ZERO_RESULTS") {
+            alert("No results found! Please try a different search term.");
+        }
+        else {
+            //loop through the array of places returned by the request and add an li element to the places list
+            for (var i = 0; i < parsedPlaces.results.length; i++) {
+                var locationString = JSON.stringify(parsedPlaces.results[i].geometry.location);
+                //the onclick function calls the update map function to show the selected place
+                var element = "<li onclick='Javascript:updateMap("+locationString+")'>"+parsedPlaces.results[i].name+" - "+parsedPlaces.results[i].vicinity+"</li>";
+                placeList.innerHTML += element;
+            };
+        }
 
-        //loop through the array of places returned by the request and add an li element to the places list
-        for (var i = 0; i < parsedPlaces.results.length; i++) {
-            var locationString = JSON.stringify(parsedPlaces.results[i].geometry.location);
-            //the onclick function calls the update map function to show the selected place
-            var element = "<li onclick='Javascript:updateMap("+locationString+")'>"+parsedPlaces.results[i].name+" - "+parsedPlaces.results[i].vicinity+"</li>";
-            placeList.innerHTML += element;
-        };
+
     } catch {
-        alert("No results found! Please try a different Search term.");
+        alert("No results found! Please try a different search term.");
     };
   
 
