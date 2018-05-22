@@ -39,7 +39,7 @@ button {
 #mapContainer {
     background-color: #1976d2;
     display: inline-block;
-    width: 70%;
+    width: 60%;
     height: 50%;
     float: left;
 }
@@ -47,7 +47,7 @@ button {
 #cityListContainer {
     background-color: #1976d2;
     display: inline-block;
-    width: 30%;
+    width: 40%;
     height: 50%;
     float: right;
     box-sizing: border-box;
