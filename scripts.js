@@ -1,6 +1,4 @@
-//GOOGLE PLACES API KEY:  AIzaSyBfr9AHIBiM-cj5XfxtP6Leh-k6X5Fm0d0 
-//TIMEZONEDB API KEY: IFJLIHI7IEVB
-//TIMEZONEDB DOCUMENTATION: https://timezonedb.com/references/get-time-zone
+//apiDemo Scripts
 
 //create map, geocoder and array here so we can use them everywhere
 var map;
@@ -74,7 +72,7 @@ function initialize() {
 
 function createCityObject(search) {
     //use the geocoder to search for the user's search term
-    geocoder.geocode({'address': search}, function(result, status) {
+    geocoder.geocode({'address': search, 'region': 'nz'}, function(result, status) {
         if (status == 'OK') {
             //get the formatted address and co-ordinates from geocoder response
             var name = result[0].formatted_address;
